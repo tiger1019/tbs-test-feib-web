@@ -1,0 +1,109 @@
+<!-- <!DOCTYPE html> -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>FEIB POC Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+<body>
+<h1>Transaction Details</h1>
+
+<form action="" id="txform" method="post">
+  <label for="userID">User ID:</label>
+  <input type="text" id="userID" name="userID" autocomplete="off" value="A123XXX789"><br><br>
+  <input type="submit" value="Submit"></input>
+</form>
+
+<div id="msg"></div><br><br>
+<div id="report"></div>
+
+<script charset="text/javascript" src="http://web.feib.com:8000/web/jquery.min.js"></script>
+<script>
+
+// curl -X POST "http://localhost:9070/business/api/transactionDetails" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"userID\":\"A123XXX789\"}"
+var url = "http://web.feib.com:8000/business/api/transactionDetails";
+
+var ALL = document.all;
+const form  = document.getElementById('txform');
+
+var postJsonData= new Object();
+var txData= new Object();
+
+function tx(txData) {
+	var ajaxSettings = {
+			  "url": url,
+			  "method": "POST",
+			  "timeout": 0,
+			  "headers": {
+		      "Content-Type": "application/json",
+		      "X-API-KEY": "43074034-bd3b-44d1-aeab-c58beec513e2",
+		      "Accept-Language": "zh-TW"     
+			  },
+			  "aync": false,
+		      "dataType": "json",
+			  "data": JSON.stringify(txData),
+			  "error": function(jqXHR, textStatus, errorThrown) {
+		        console.log("ajax error =" + jqXHR);
+		        ALL.msg.innerHTML = ">>>>Error<<<<";
+			  }
+	};
+
+	$.ajax(ajaxSettings).done(function (response) {
+		  console.log(response);
+		  //var data = JSON.parse(response); // data.code, data.message ?
+		  console.log("ajax result = ");		  
+		  //ALL.msg.innerHTML = JSON.stringify(response);
+		  if (response?.purchase?.length > 0) {
+			  ALL.msg.innerHTML = "共 " + response.purchase.length + " 筆";
+			  show(response);
+		  }
+    });	
+}
+
+function show(response) {
+	var begin = '<table border=1 style="width:90%" align="center" >';
+	var end = '</table>';	
+	var header = '<tr>' +
+	             '<td align="center" bgcolor="#FFF9C4" colspan="1">卡號</td>' +
+	             '<td align="center" bgcolor="#FFF9C4" colspan="1">購貨日期</td>' +
+	             '<td align="center" bgcolor="#FFF9C4" colspan="1">說明</td>' +
+	             '<td align="center" bgcolor="#FFF9C4" colspan="1">金額</td>' +
+	             '</tr>';
+	var lines = "";             
+	for(var i=0; i<response.purchase.length; i++) {
+		var color = "#CFD8DC";
+		if (i%2 == 0) {
+			color = "#ECEFF1";
+		}
+		lines += '<tr>';
+		lines += `<td align="center" bgcolor=${color}>` + response.purchase[i].cardNo + '</td>';
+		lines += `<td align="center" bgcolor=${color}>` + response.purchase[i].purchaseDate + '</td>';
+		lines += `<td align="center" bgcolor=${color}>` + response.purchase[i].description + '</td>';
+		lines += `<td align="center" bgcolor=${color}>` + response.purchase[i].localAmount + '</td>';
+		lines += '</tr>';
+	}
+	var table = begin + header + lines + end;
+	ALL.report.innerHTML = table;
+}
+
+
+form.addEventListener('submit', (event) => {
+    // handle the form data
+	event.preventDefault();
+	console.log("submit");
+	ALL.msg.innerHTML = "";
+	ALL.report.innerHTML = "";
+	var textbox = document.getElementById('userID');
+	postJsonData.userID = textbox.value;
+	console.log(">>>" + textbox.value);
+	console.log(">>>" + JSON.stringify(postJsonData));
+    tx(postJsonData);
+});
+
+</script>
+</body>

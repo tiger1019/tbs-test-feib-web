@@ -1,0 +1,29 @@
+[Unit]
+Description=creditcard-business
+After=syslog.target
+
+[Service]
+User=app
+TimeoutStopSec=45s
+#WorkingDirectory=/opt/creditcard-business
+
+ExecStart=/usr/bin/java \
+    -cp "/opt/creditcard-business/conf:/opt/creditcard-business/lib/*" \
+    -Dspring.application.admin.enabled=false \
+    -Dfile.encoding=UTF8 \
+    -Djava.awt.headless=true \
+	-Djava.security.egd=file:/dev/urandom \
+    -Dlogger.file=/opt/creditcard-business/conf/logback.xml \
+	-Dloader.main=com.feib.business.api.FeibCreditCardBusinessServiceApplication \
+	-Dspring.profiles.active=prod \
+    -Xms256m \
+    -Xmx1024m \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/tmp \
+    org.springframework.boot.loader.PropertiesLauncher
+    
+
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

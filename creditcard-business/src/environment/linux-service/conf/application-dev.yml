@@ -1,0 +1,14 @@
+efk:
+  fluentd:
+    host: "127.0.0.1"
+    port: "24224"
+
+integration:
+  # 0=api, 1=asyncQ, 2=syncQ, 
+  adapter-type: 2
+  int9013:
+    url: http://localhost:9090/integration/api/ivr9013
+    channel: int9013ReqQueue
+  int9014:
+    url: http://localhost:9090/integration/api/ivr9014
+    channel: int9014ReqQueue 

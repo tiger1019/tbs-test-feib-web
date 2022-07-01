@@ -1,0 +1,149 @@
+server:
+  address: 0.0.0.0
+  port: 9070
+  servlet:
+    contextPath: /
+
+  error:
+    whitelabel:
+      enabled: false
+
+  compression:
+    enabled: true
+    min-response-size: 256
+    mime-types: text/html,text/xml,text/plain,application/json,application/xml,text/css,application/javascript,image/svg+xml
+
+  shutdown: graceful
+
+spring:
+  profiles:
+   active: dev
+
+  devtools:
+    restart:
+      enabled: true
+      exclude: static/**,public/**
+    livereload:
+      enabled: true
+
+  application:
+    name: business-api
+
+  ## enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+  main:
+    allow-bean-definition-overriding: true
+
+  lifecycle:
+    timeout-per-shutdown-phase: 1m
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      write-date-timestamps-as-nanoseconds: false
+      fail-on-empty-beans: false
+## json convert     
+#    date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+#    time-zone: GMT+0
+#    time-zone: "UTC"
+
+# multipart upload folder
+  http:
+    multipart:
+      location: ./upload
+    encoding:
+      charset: UTF-8
+      force: true
+
+  mvc:
+    #pathmatch:
+    #  matching-strategy: ant-path-matcher
+    #static-path-pattern: /app/**
+    #resources:
+    #  # classpath:/files/,classpath:/static-files,file:/opt/files
+    #  static-locations: classpath:/static/pages
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp    
+
+  servlet:
+    multipart:
+      max-file-size: 31MB
+      max-request-size: 31MB
+
+  batch:
+    table-prefix: batch_
+    job:
+      enabled: false
+    # always, never
+    initialize-schema: never  
+    initializer:
+      enabled: false
+
+  # RabbitMQ properties
+  rabbitmq:
+   addresses: localhost:5672
+   adminAddresses: http://localhost:15672
+   nodes: rabbit@localhost
+   username: andy
+   password: 123qwe
+   virtual-host: /
+   useSSL: false
+   sslProperties:
+   ssl:
+     keyStore:
+     keyStorePassphrase:
+     trustStore:
+     trustStorePassphrase:
+   channelCacheSize: 100
+   listener:
+     simple:
+       default-requeue-rejected: false
+       retry:
+         enabled: false
+       # auto, manual
+       acknowledge-mode: auto
+
+security:
+  basic:
+    enabled: false
+
+# Force enable health probes. Would be enabled on kubernetes platform by default
+management:
+  health:
+    probes:
+      enabled: true
+
+logging:
+  file: business-api.log
+  #pattern:
+  #  console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  level:
+    com.feib: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.springframework: DEBUG
+#    org.springframework.http.client: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+
+efk:
+  fluentd:
+    host: "127.0.0.1"
+    port: "24224"
+
+#opentracing:
+#  spring:
+#    cloud:
+#      jdbc:
+#        enabled: false
+#      log:
+#        enabled: true
+#  jaeger:
+#    enabled: true
+#    log-spans: true  
+#    service-name: ${spring.application.name}
+#    udp-sender:
+#      host: 10.106.220.158
+#      port: 6831
+#    probabilistic-sampler:
+#      sampling-rate: 1.0
+#    const-sampler:
+#      decision: true

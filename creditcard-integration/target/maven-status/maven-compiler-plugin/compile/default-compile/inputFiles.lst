@@ -1,0 +1,8 @@
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/config/CamelConfig.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/config/AsyncConfig.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/controller/IntegrationBridgeController.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/FeibCreditCardIntegrationServiceApplication.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/config/SwaggerConfig.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/config/AmqpConfig.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/processor/CreditCardProcessor.java
+/Users/tiger/Desktop/光武哥java/feib-poc-main/creditcard-integration/src/main/java/com/feib/integration/api/route/CreditCardRoute.java

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	
+    <springProperty scope="context" name="springAppName" source="spring.application.name" />
+    <springProperty scope="context" name="env" source="spring.profiles.active" defaultValue="dev"/>
+	<springProperty scope="context" name="fluentHost" source="efk.fluentd.host"/>
+    <springProperty scope="context" name="fluentPort" source="efk.fluentd.port" defaultValue="24224" />
+	
+    <property name="CHARSET" value="UTF-8" />
+    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n" />
+    
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+      <discriminator>
+        <key>userid</key>
+        <defaultValue>unknown</defaultValue>
+      </discriminator>
+      <sift>
+        <appender name="FILE-${userid}.log" class="ch.qos.logback.core.FileAppender">
+          <file>${userid}.log</file>
+          <append>false</append>
+          <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+          </layout>
+        </appender>
+      </sift>
+    </appender>
+    
+	<!-- 每日切換日誌文件 -->
+    <appender name="DRF" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/app.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          	<!--日誌文件輸出的文件名-->
+          	<FileNamePattern>logs/app.%d{yyyy-MM-dd}.log</FileNamePattern>
+          	<!--日誌文件保留天數-->
+          	<maxHistory>7</maxHistory>               	      
+        </rollingPolicy>
+        <encoder>
+          	<Pattern>${PATTERN}</Pattern>
+          	<charset>${CHARSET}</charset>
+        </encoder>   
+        
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+          	<MaxFileSize>100MB</MaxFileSize>
+        </triggeringPolicy>           
+    </appender>
+    
+    <appender name="FLUENT" class="ch.qos.logback.more.appenders.DataFluentAppender">
+        <tag>debug</tag>
+        <label>normal</label>
+        <remoteHost>${fluentHost}</remoteHost>
+        <port>${fluentPort}</port>
+
+        <additionalField>
+            <key>env</key>
+            <value>${env}</value>
+        </additionalField>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers class="net.logstash.logback.composite.loggingevent.LoggingEventJsonProviders">
+                <pattern>
+                    <pattern>
+                        {
+                        "timestamp": "%date{ISO8601}",
+                        "level": "%level",
+                        "application": "${springAppName:-}",
+                        "trace": "%X{trace_id:-}",
+                        "span": "%X{span_id:-}",
+                        "trace_flags": "%X{trace_flags:-}",
+                        "pid": "${PID:-}",
+                        "thread": "%thread",
+                        "class": "%logger{40}",
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+     	
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+
+	<!-- 
+	<logger name="com.feib" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="DRF" />  
+	</logger>
+	 -->        
+	
+	<springProfile name="dev">
+    <root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+      <appender-ref ref="FLUENT" />
+		</root>
+  </springProfile>
+    
+  <springProfile name="prod">
+    <root level="ERROR">
+			<appender-ref ref="STDOUT" />
+      <appender-ref ref="FLUENT" />
+		</root>
+  </springProfile>
+	
+	
+</configuration>
